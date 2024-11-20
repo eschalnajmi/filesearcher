@@ -5,6 +5,14 @@ import pathlib
 
 # [name, path, type, size]
 
+def get_directory_size(directory):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(directory):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+    return total_size
+
 def find(name, directory):
     exclude = ['.n5', '.ome.zarr', '.ome.tiff', '.zarr']
     found_files = []
@@ -15,7 +23,8 @@ def find(name, directory):
             if any(dirname.endswith(suffix) for suffix in exclude):
                 if name in dirname:
                     full_path = os.path.join(dirpath, dirname)
-                    found_files.append([dirname, full_path, pathlib.Path(full_path).suffix, "--"])
+                    dir_size = get_directory_size(full_path)
+                    found_files.append([dirname, full_path, pathlib.Path(full_path).suffix, dir_size])
                     print(f"Found pyramidal directory: {full_path}")
                 dirnames.remove(dirname)
 
